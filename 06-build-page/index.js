@@ -4,10 +4,17 @@ const path = require('path');
 
 async function createFolder() {
   try {
+    await fsPromises.rm(
+      path.join(__dirname, 'project-dist'),
+      { recursive: true, force: true },
+      (err) => {
+        if (err) console.log(err);
+      },
+    );
     await fsPromises.mkdir(path.join(__dirname, 'project-dist'));
     await fsPromises.mkdir(path.join(__dirname, 'project-dist', 'assets'));
   } catch (e) {
-    return;
+    console.log(e);
   }
 }
 
