@@ -46,10 +46,7 @@ async function copyAssets() {
         const check = async () => {
           const stat = await fsPromises.stat(path.join(src, file));
           if (stat.isFile()) {
-            const input = await fsPromises.readFile(
-              path.join(src, file),
-              'utf8',
-            );
+            const input = await fsPromises.readFile(path.join(src, file));
             fs.writeFile(path.join(dest, file), input, (err) => {
               if (err) console.log(err);
             });
