@@ -39,15 +39,39 @@ function bundleCSS() {
 }
 
 async function copyAssets() {
-  try {
-    await fsPromises.cp(
-      path.join(__dirname, 'assets'),
-      path.join(__dirname, 'project-dist', 'assets'),
-      { recursive: true },
-    );
-  } catch (err) {
-    return;
-  }
+  const copy = async (src, dest) => {
+    try {
+      const list = await fsPromises.readdir(src);
+      list.forEach((file) => {
+        const check = async () => {
+          const stat = await fsPromises.stat(path.join(src, file));
+          if (stat.isFile()) {
+            const input = await fsPromises.readFile(
+              path.join(src, file),
+              'utf8',
+            );
+            fs.writeFile(path.join(dest, file), input, (err) => {
+              if (err) console.log(err);
+            });
+          } else if (stat.isDirectory()) {
+            try {
+              await fsPromises.mkdir(path.join(dest, file));
+            } catch (err) {
+              console.log('copying to existing directory');
+            }
+            await copy(path.join(src, file), path.join(dest, file));
+          }
+        };
+        check();
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  await copy(
+    path.join(__dirname, 'assets'),
+    path.join(__dirname, 'project-dist', 'assets'),
+  );
 }
 
 async function extractComponent(name) {
