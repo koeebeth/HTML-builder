@@ -91,33 +91,37 @@ async function extractComponent(name) {
 }
 
 async function generateHTML() {
-  const template = await fsPromises.readFile(
-    path.join(__dirname, 'template.html'),
-    'utf8',
-  );
+  try {
+    const template = await fsPromises.readFile(
+      path.join(__dirname, 'template.html'),
+      'utf8',
+    );
 
-  const placeholders = [];
-  template.replaceAll(/{{.*}}/g, (match) => {
-    const componentName = match.split('').slice(2, -2).join('');
-    placeholders.push(extractComponent(componentName));
-    return match;
-  });
+    const placeholders = [];
+    template.replaceAll(/{{.*}}/g, (match) => {
+      const componentName = match.split('').slice(2, -2).join('');
+      placeholders.push(extractComponent(componentName));
+      return match;
+    });
 
-  let output = await Promise.all(placeholders);
-  const htmlBuild = template.replaceAll(/{{.*}}/g, () => {
-    const content = output.shift();
-    return content;
-  });
+    let output = await Promise.all(placeholders);
+    const htmlBuild = template.replaceAll(/{{.*}}/g, () => {
+      const content = output.shift();
+      return content;
+    });
 
-  fs.writeFile(
-    path.join(__dirname, 'project-dist', 'index.html'),
-    htmlBuild,
-    (err) => {
-      if (err) {
-        console.log(err);
-      }
-    },
-  );
+    fs.writeFile(
+      path.join(__dirname, 'project-dist', 'index.html'),
+      htmlBuild,
+      (err) => {
+        if (err) {
+          console.log(err);
+        }
+      },
+    );
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 async function createBundle() {
